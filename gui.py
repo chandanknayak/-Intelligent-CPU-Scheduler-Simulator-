@@ -3,7 +3,7 @@ from scheduler import fcfs_scheduling
 from process_input import get_process_input
 
 class CPUSchedulerGUI:
-    def _init_(self, root):
+    def __init__(self, root):
         self.root = root
         self.root.title("CPU Scheduler Simulator")
         self.process_list = []
@@ -33,7 +33,7 @@ class CPUSchedulerGUI:
         for p in processes:
             self.result_text.insert(tk.END, f"{p.pid}\t{p.arrival_time}\t{p.burst_time}\t{p.waiting_time}\t{p.turnaround_time}\n")
 
-if _name_ == "_main_":
+if __name__ == "__main__":
     root = tk.Tk()
     app = CPUSchedulerGUI(root)
     root.mainloop()
