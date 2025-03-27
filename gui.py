@@ -1,39 +1,39 @@
-import tkinter as tk
-from scheduler import fcfs_scheduling
-from process_input import get_process_input
+import matplotlib.pyplot as plt
 
-class CPUSchedulerGUI:
-    def __init__(self, root):
-        self.root = root
-        self.root.title("CPU Scheduler Simulator")
-        self.process_list = []
+def plot_gantt_chart(processes):
+    """Plots the Gantt Chart for process execution timeline."""
+    fig, ax = plt.subplots()
+    start_time = 0
 
-        self.label = tk.Label(root, text="CPU Scheduler", font=("Arial", 14))
-        self.label.pack()
+    for process in processes:
+        ax.broken_barh([(start_time, process.burst_time)], (10, 9), facecolors='blue')
+        ax.text(start_time + process.burst_time / 2, 15, f"P{process.pid}", ha='center', va='center')
+        start_time += process.burst_time
 
-        self.add_process_button = tk.Button(root, text="Add Processes", command=self.add_processes)
-        self.add_process_button.pack()
-
-        self.run_fcfs_button = tk.Button(root, text="Run FCFS", command=self.run_fcfs)
-        self.run_fcfs_button.pack()
-
-        self.result_text = tk.Text(root, height=10, width=50)
-        self.result_text.pack()
-
-    def add_processes(self):
-        self.process_list = get_process_input()
-
-    def run_fcfs(self):
-        scheduled = fcfs_scheduling(self.process_list)
-        self.display_results(scheduled)
-
-    def display_results(self, processes):
-        self.result_text.delete('1.0', tk.END)
-        self.result_text.insert(tk.END, "PID\tArrival\tBurst\tWaiting\tTurnaround\n")
-        for p in processes:
-            self.result_text.insert(tk.END, f"{p.pid}\t{p.arrival_time}\t{p.burst_time}\t{p.waiting_time}\t{p.turnaround_time}\n")
+    ax.set_xlabel("Time")
+    ax.set_yticks([])
+    ax.set_title("Gantt Chart")
+    plt.show()
 
 if __name__ == "__main__":
-    root = tk.Tk()
-    app = CPUSchedulerGUI(root)
-    root.mainloop()
+    from process_input import get_process_input
+    from scheduler import fcfs_scheduling, sjf_scheduling, priority_scheduling, round_robin_scheduling
+
+    # Get process input
+    processes, scheduling_type, quantum = get_process_input()
+
+    # Apply scheduling algorithm
+    if scheduling_type == "fcfs":
+        scheduled = fcfs_scheduling(processes)
+    elif scheduling_type == "sjf":
+        scheduled = sjf_scheduling(processes)
+    elif scheduling_type == "priority":
+        scheduled = priority_scheduling(processes)
+    elif scheduling_type == "rr":
+        scheduled = round_robin_scheduling(processes, quantum)
+    else:
+        print("Invalid scheduling type selected.")
+        exit()
+
+    # Plot Gantt chart after scheduling
+    plot_gantt_chart(scheduled)
